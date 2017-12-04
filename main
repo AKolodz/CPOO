@@ -6,7 +6,14 @@ original = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
 cv2.namedWindow("Input Phantom Image", cv2.WINDOW_NORMAL)
 cv2.imshow("Input Phantom Image", original)
 
-binary = cv2.
+median = cv2.medianBlur(original, 13)
+cv2.namedWindow("Median", cv2.WINDOW_NORMAL)
+cv2.imshow("Median", median)
+
+binary = cv2.adaptiveThreshold(median, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                               cv2.THRESH_BINARY, 11, 2)
+cv2.namedWindow("Binary", cv2.WINDOW_NORMAL)
+cv2.imshow("Binary", binary)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
