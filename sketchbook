@@ -1,0 +1,31 @@
+
+
+# median = cv2.medianBlur(original, 11)
+# cv2.namedWindow("Median", cv2.WINDOW_NORMAL)
+# cv2.imshow("Median", median)
+
+
+# binary = cv2.adaptiveThreshold(median, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+# cv2.namedWindow("Binary", cv2.WINDOW_NORMAL)
+# cv2.imshow("Binary", binary)
+
+
+# lines = cv2.HoughLines(edges, 1, np.pi / 200, 200)
+# for i in range(0, len(lines)):
+#     for rho, theta in lines[i]:
+#         a = np.cos(theta)
+#         b = np.sin(theta)
+#         x0 = a * rho
+#         y0 = b * rho
+#         x1 = int(x0 + 1000 * (-b))
+#         y1 = int(y0 + 1000 * (a))
+#         x2 = int(x0 - 1000 * (-b))
+#         y2 = int(y0 - 1000 * (a))
+#         cv2.line(small, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+https://docs.opencv.org/3.2.0/da/d6e/tutorial_py_geometric_transformations.html
+# pts1 = np.float32([[112, 156], [112, 706], [663, 154], [665, 704]])
+# pts2 = np.float32([[0, 0], [0, 300], [300, 0], [300, 300]])
+# M = cv2.getPerspectiveTransform(pts1, pts2)
+# perspective = cv2.warpPerspective(colored, M, (300, 300))
+
