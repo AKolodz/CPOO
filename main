@@ -1,60 +1,12 @@
 import cv2
-import numpy as np
 
-original = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
-colored = cv2.imread("ExamplePhantom.png")
+from WindowAligner import WindowAligner
 
-cv2.namedWindow("Input Phantom Image", cv2.WINDOW_NORMAL)
-cv2.imshow("Input Phantom Image", original)
+inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
+alignedImage = WindowAligner.align(inputImage)
 
-small = cv2.resize(original, (0, 0), fx=0.25, fy=0.25)
-colored = cv2.resize(colored, (0, 0), fx=0.25, fy=0.25)
-cv2.namedWindow("Small Image", cv2.WINDOW_NORMAL)
-cv2.imshow("Small Image", colored)
-
-colored = colored[10:754, 10:754]
-cut = small[10:754, 10:754]
-cv2.namedWindow("Cut Image", cv2.WINDOW_NORMAL)
-cv2.imshow("Cut Image", cut)
-
-edges = cv2.Canny(cut, 400, 350, None, 3)
-cv2.namedWindow("Canny", cv2.WINDOW_NORMAL)
-cv2.imshow("Canny", edges)
-
-degrees = 0
-
-# linesP = cv2.HoughLinesP(edges, 1, np.pi / 180, 250, None, 200, 10)
-# if linesP is not None:
-#     for i in range(0, len(linesP)):
-#         for theta in linesP[i]:
-#             l = linesP[i][0]
-#             cv2.line(colored, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv2.LINE_AA)
-#             degrees = theta
-
-lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 180, None, 100, 10)
-if lines is not None:
-    for i in range(0, len(lines)):
-        for x1, y1, x2, y2 in lines[2]:
-            cv2.line(colored, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            deltay = abs(y1 - y2)
-            deltax = abs(x1 - x2)
-            rads = np.math.atan(deltay / deltax)
-            degrees = rads * 360 / (2 * np.pi)
-
-cv2.namedWindow("Edged Phantom Image", cv2.WINDOW_NORMAL)
-cv2.imshow("Edged Phantom Image", colored)
-
-rows, cols = cut.shape
-M = cv2.getRotationMatrix2D((cols / 2, rows / 2), degrees, 1)
-rotated = cv2.warpAffine(colored, M, (cols, rows))
-cv2.namedWindow("Rotated", cv2.WINDOW_NORMAL)
-cv2.imshow("Rotated", rotated)
-
-perspective = rotated[152:705, 112:662]
-
-
-cv2.namedWindow("Perspective", cv2.WINDOW_NORMAL)
-cv2.imshow("Perspective", perspective)
+cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
+cv2.imshow("Aligned", alignedImage)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
