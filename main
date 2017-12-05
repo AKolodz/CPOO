@@ -17,7 +17,7 @@ cut = small[10:754, 10:754]
 cv2.namedWindow("Cut Image", cv2.WINDOW_NORMAL)
 cv2.imshow("Cut Image", cut)
 
-edges = cv2.Canny(cut, 500, 500, None, 3)
+edges = cv2.Canny(cut, 400, 350, None, 3)
 cv2.namedWindow("Canny", cv2.WINDOW_NORMAL)
 cv2.imshow("Canny", edges)
 
@@ -31,10 +31,10 @@ degrees = 0
 #             cv2.line(colored, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv2.LINE_AA)
 #             degrees = theta
 
-lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 230, None, 100, 10)
+lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 180, None, 100, 10)
 if lines is not None:
     for i in range(0, len(lines)):
-        for x1, y1, x2, y2 in lines[i]:
+        for x1, y1, x2, y2 in lines[2]:
             cv2.line(colored, (x1, y1), (x2, y2), (0, 255, 0), 2)
             deltay = abs(y1 - y2)
             deltax = abs(x1 - x2)
@@ -45,7 +45,7 @@ cv2.namedWindow("Edged Phantom Image", cv2.WINDOW_NORMAL)
 cv2.imshow("Edged Phantom Image", colored)
 
 rows, cols = cut.shape
-M = cv2.getRotationMatrix2D((cols / 2, rows / 2), degrees-90, 1)
+M = cv2.getRotationMatrix2D((cols / 2, rows / 2), degrees, 1)
 rotated = cv2.warpAffine(colored, M, (cols, rows))
 cv2.namedWindow("Rotated", cv2.WINDOW_NORMAL)
 cv2.imshow("Rotated", rotated)
