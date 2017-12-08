@@ -26,17 +26,7 @@ class WindowAligner:
         rotationMatrix = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
         rotatedImage = cv2.warpAffine(image, rotationMatrix, (cols, rows))
 
-        # let user choose 2 points (left upper corner and right bottom corner) that define boundaries of the result image
-        # leftUpperCornerPoint = getPoint(rotatedImage)
-        # rightBottomCornerPoint = getPoint(rotatedImage)
-        # x1, y1 = leftUpperCornerPoint
-        # x2, y2 = rightBottomCornerPoint
-
-        x1, y1 = (448, 608)
-        x2, y2 = (662 * 4, 705 * 4)
-        
-        return rotatedImage[y1:y2, x1:x2]
-
+        return rotatedImage
 
 def lowerResolution(image, times):
     return cv2.resize(image, (0, 0), fx=1 / times, fy=1 / times)

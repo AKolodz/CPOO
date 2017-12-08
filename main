@@ -1,6 +1,7 @@
 import cv2
-import numpy as np
 
+from ImageCutter import ImageCutter
+from NoiseGenerator import NoiseGenerator
 from WindowAligner import WindowAligner
 
 inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
@@ -9,26 +10,40 @@ alignedImage = WindowAligner.align(inputImage)
 cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
 cv2.imshow("Aligned", alignedImage)
 
-# SNR:
-roi = alignedImage[517:923, 717:1479]
-noise = np.copy(roi)
-cv2.randn(noise, 0, 20)
-noisedRoi = roi + noise
+# Cut
+# leftUpperCornerPoint = getPoint(rotatedImage)
+# rightBottomCornerPoint = getPoint(rotatedImage)
+# p1 = leftUpperCornerPoint
+# p2 = rightBottomCornerPoint", cv2.WINDOW_NORMAL)
+# p1 = (448, 608)
+# p2 = (662 * 4, 705 * 4)
+# phantomImage = ImageCutter.cut(alignedImage, p1, p2)
+# cv2.namedWindow("Cut", cv2.WINDOW_NORMAL)
+# cv2.imshow("Cut", phantomImage)
 
-cv2.namedWindow("ROI", cv2.WINDOW_NORMAL)
-cv2.imshow("ROI", roi)
-cv2.namedWindow("Noise", cv2.WINDOW_NORMAL)
-cv2.imshow("Noise", noise)
-cv2.namedWindow("Noise", cv2.WINDOW_NORMAL)
-cv2.imshow("Noised ROI", noisedRoi)
+snrPhantom = ImageCutter.cut(alignedImage, (1100, 1100), (2000, 1600))
+noisedSnrPhantom = NoiseGenerator.addGaussian(snrPhantom, 0, 20)
 
-mean, stdev = cv2.meanStdDev(roi)
-nmean, nstdev = cv2.meanStdDev(noise)
-nrmean, nrstdev = cv2.meanStdDev(noisedRoi)
+backgroundImage1 = ImageCutter.cut(alignedImage, (1000, 80), (1300, 300))
+backgroundImage2 = ImageCutter.cut(alignedImage, (0, 1000), (300, 1300))
 
-print("ROI : mean {}, sd {}".format(mean, stdev))
-print("NOISE : mean {}, sd {}".format(nmean, nstdev))
-print("NOISED ROI : mean {}, sd {}".format(nrmean, nrstdev))
+cv2.namedWindow("SNR ROI", cv2.WINDOW_NORMAL)
+cv2.imshow("SNR ROI", snrPhantom)
+cv2.namedWindow("Noised SNR ROI", cv2.WINDOW_NORMAL)
+cv2.imshow("Noised SNR ROI", noisedSnrPhantom)
 
+mean, stddev = cv2.meanStdDev(snrPhantom)
+nmean, nstddev = cv2.meanStdDev(noisedSnrPhantom)
+bmean1, bstddev1 = cv2.meanStdDev(backgroundImage1)
+bmean2, bstddev2 = cv2.meanStdDev(backgroundImage2)
+
+SNR = mean / stddev
+noisedSNR=nmean/nstddev
+print("ROI : mean {}, sd {}".format(mean, stddev))
+print("NOISED ROI : mean {}, sd {}".format(nmean, nstddev))
+print("Background 1 : mean {}, sd {}".format(bmean1, bstddev1))
+print("Background 2 : mean {}, sd {}".format(bmean2, bstddev2))
+print("SNR = {}".format(SNR))
+print("Noised SNR = {}".format(noisedSNR))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
