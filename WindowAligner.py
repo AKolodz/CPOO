@@ -13,14 +13,14 @@ class WindowAligner:
         image = removeMargins(image, 10 * resolutionMultiplier)
 
         edges = cv2.Canny(lowResImg, 400, 350, None, 3)
-        cv2.namedWindow("Edges", cv2.WINDOW_NORMAL)
-        cv2.imshow("Edges", edges)
+        #cv2.namedWindow("Edges", cv2.WINDOW_NORMAL)
+        #cv2.imshow("Edges", edges)
 
         # morphological opening?
 
         angle = findRotationDegree(edges, lowResImg)
-        cv2.namedWindow("Alignment line", cv2.WINDOW_NORMAL)
-        cv2.imshow("Alignment line", lowResImg)
+        #cv2.namedWindow("Alignment line", cv2.WINDOW_NORMAL)
+        #cv2.imshow("Alignment line", lowResImg)
 
         rows, cols = image.shape
         rotationMatrix = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)

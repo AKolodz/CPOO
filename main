@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 from WindowAligner import WindowAligner
 
@@ -7,6 +8,27 @@ alignedImage = WindowAligner.align(inputImage)
 
 cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
 cv2.imshow("Aligned", alignedImage)
+
+# SNR:
+roi = alignedImage[517:923, 717:1479]
+noise = np.copy(roi)
+cv2.randn(noise, 0, 20)
+noisedRoi = roi + noise
+
+cv2.namedWindow("ROI", cv2.WINDOW_NORMAL)
+cv2.imshow("ROI", roi)
+cv2.namedWindow("Noise", cv2.WINDOW_NORMAL)
+cv2.imshow("Noise", noise)
+cv2.namedWindow("Noise", cv2.WINDOW_NORMAL)
+cv2.imshow("Noised ROI", noisedRoi)
+
+mean, stdev = cv2.meanStdDev(roi)
+nmean, nstdev = cv2.meanStdDev(noise)
+nrmean, nrstdev = cv2.meanStdDev(noisedRoi)
+
+print("ROI : mean {}, sd {}".format(mean, stdev))
+print("NOISE : mean {}, sd {}".format(nmean, nstdev))
+print("NOISED ROI : mean {}, sd {}".format(nrmean, nrstdev))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
