@@ -28,6 +28,7 @@ class WindowAligner:
 
         return rotatedImage
 
+
 def lowerResolution(image, times):
     return cv2.resize(image, (0, 0), fx=1 / times, fy=1 / times)
 

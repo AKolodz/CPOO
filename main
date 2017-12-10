@@ -1,49 +1,20 @@
 import cv2
 
-from ImageCutter import ImageCutter
 from NoiseGenerator import NoiseGenerator
+from ParamCalculator import ParamCalculator
 from WindowAligner import WindowAligner
 
 inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
 alignedImage = WindowAligner.align(inputImage)
+noisedImage = NoiseGenerator.addGaussian(alignedImage, 0, 20)
 
 cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
 cv2.imshow("Aligned", alignedImage)
+cv2.namedWindow("Noised", cv2.WINDOW_NORMAL)
+cv2.imshow("Noised", noisedImage)
 
-# Cut
-# leftUpperCornerPoint = getPoint(rotatedImage)
-# rightBottomCornerPoint = getPoint(rotatedImage)
-# p1 = leftUpperCornerPoint
-# p2 = rightBottomCornerPoint", cv2.WINDOW_NORMAL)
-# p1 = (448, 608)
-# p2 = (662 * 4, 705 * 4)
-# phantomImage = ImageCutter.cut(alignedImage, p1, p2)
-# cv2.namedWindow("Cut", cv2.WINDOW_NORMAL)
-# cv2.imshow("Cut", phantomImage)
+snr = ParamCalculator.getSNR(alignedImage, (1100, 1100), (2000, 1600))
+noisedSnr = ParamCalculator.getSNR(noisedImage, (1100, 1100), (2000, 1600))
 
-snrPhantom = ImageCutter.cut(alignedImage, (1100, 1100), (2000, 1600))
-noisedSnrPhantom = NoiseGenerator.addGaussian(snrPhantom, 0, 20)
-
-backgroundImage1 = ImageCutter.cut(alignedImage, (1000, 80), (1300, 300))
-backgroundImage2 = ImageCutter.cut(alignedImage, (0, 1000), (300, 1300))
-
-cv2.namedWindow("SNR ROI", cv2.WINDOW_NORMAL)
-cv2.imshow("SNR ROI", snrPhantom)
-cv2.namedWindow("Noised SNR ROI", cv2.WINDOW_NORMAL)
-cv2.imshow("Noised SNR ROI", noisedSnrPhantom)
-
-mean, stddev = cv2.meanStdDev(snrPhantom)
-nmean, nstddev = cv2.meanStdDev(noisedSnrPhantom)
-bmean1, bstddev1 = cv2.meanStdDev(backgroundImage1)
-bmean2, bstddev2 = cv2.meanStdDev(backgroundImage2)
-
-SNR = mean / stddev
-noisedSNR=nmean/nstddev
-print("ROI : mean {}, sd {}".format(mean, stddev))
-print("NOISED ROI : mean {}, sd {}".format(nmean, nstddev))
-print("Background 1 : mean {}, sd {}".format(bmean1, bstddev1))
-print("Background 2 : mean {}, sd {}".format(bmean2, bstddev2))
-print("SNR = {}".format(SNR))
-print("Noised SNR = {}".format(noisedSNR))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
