@@ -1,20 +1,42 @@
 import cv2
 
+from ImageCutter import ImageCutter
 from NoiseGenerator import NoiseGenerator
 from ParamCalculator import ParamCalculator
 from WindowAligner import WindowAligner
 
 inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
 alignedImage = WindowAligner.align(inputImage)
-noisedImage = NoiseGenerator.addGaussian(alignedImage, 0, 20)
 
-cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
-cv2.imshow("Aligned", alignedImage)
-cv2.namedWindow("Noised", cv2.WINDOW_NORMAL)
-cv2.imshow("Noised", noisedImage)
+#Alignment
+# cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
+# cv2.imshow("Aligned", alignedImage)
 
-snr = ParamCalculator.getSNR(alignedImage, (1100, 1100), (2000, 1600))
-noisedSnr = ParamCalculator.getSNR(noisedImage, (1100, 1100), (2000, 1600))
+#Cutting
+phantomImage = ImageCutter.cut(alignedImage, (448, 608), (2648, 2820))
+cv2.namedWindow("Phantom", cv2.WINDOW_NORMAL)
+cv2.imshow("Phantom", phantomImage)
+
+#Noised image
+noisedImage = NoiseGenerator.addGaussian(phantomImage, 0, 20)
+# cv2.namedWindow("Noised Phantom", cv2.WINDOW_NORMAL)
+# cv2.imshow("Noised Phantom", noisedImage)
+
+#SNR
+snr = ParamCalculator.getSNR(phantomImage, (650, 500), (1500, 950))
+noisedSnr = ParamCalculator.getSNR(noisedImage, (650, 500), (1500, 950))
+
+#Homogeneousness
+roi1 = ImageCutter.cut(phantomImage, (200, 200), (400, 400))
+roi2 = ImageCutter.cut(phantomImage, (1800, 200), (2000, 400))
+roi3 = ImageCutter.cut(phantomImage, (200, 1800), (400, 2000))
+roi4 = ImageCutter.cut(phantomImage, (1800, 1800), (2000, 2000))
+referenceRoi = ImageCutter.cut(phantomImage, (1000, 700), (1200, 900))
+isHomogeneous = ParamCalculator.evalHomogeneousness(roi1, roi2, roi3, roi4, referenceRoi)
+print("Is Homogeneous: {}".format(isHomogeneous))
+
+#MTF
+
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()

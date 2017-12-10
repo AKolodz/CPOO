@@ -56,8 +56,3 @@ def findRotationDegree(edgesImage, destImage):
     else:
         angle = -999
     return angle
-
-
-def getPoint(image):
-    pass
-
