@@ -22,16 +22,21 @@ for i in circles[0, :]:
     cv2.circle(kolka1, (i[0], i[1]), 2, (0, 0, 255), 3)
 cv2.imshow('detected circles', kolka1)
 
-circles = cv2.HoughCircles(alignedImage, cv2.HOUGH_GRADIENT, 1, 20,
-                           param1=50, param2=30, minRadius=0, maxRadius=0)
+# alignedImage[y1:y2, x1:x2]
+alignedImage = alignedImage[603:1630, 1560:1730]
 
-circles = np.uint16(np.around(circles))
-for i in circles[0, :]:
-    # draw the outer circle
-    cv2.circle(kolka1, (i[0], i[1]), i[2], (0, 255, 0), 2)
-    # draw the center of the circle
-    cv2.circle(kolka1, (i[0], i[1]), 2, (0, 0, 255), 3)
-cv2.imshow('detected circles', kolka1)
+alignedImage = cv2.resize(alignedImage, (0, 0), fx=0.5, fy=0.5)
+retval = cv2.threshold(alignedImage, 100, 255, cv2.THRESH_BINARY, alignedImage)
+# circles = cv2.HoughCircles(alignedImage, cv2.HOUGH_GRADIENT, 1, 20,
+#                            param1=50, param2=30, minRadius=10, maxRadius=50)
+#
+# circles = np.uint16(np.around(circles))
+# for i in circles[0, :]:
+#     # draw the outer circle
+#     cv2.circle(alignedImage, (i[0], i[1]), i[2], (0, 255, 0), 2)
+#     # draw the center of the circle
+#     cv2.circle(alignedImage, (i[0], i[1]), 2, (0, 0, 255), 3)
+cv2.imshow('detected circles ph', alignedImage)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
