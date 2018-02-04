@@ -1,16 +1,20 @@
 import cv2
-
+import matplotlib.pyplot as plt
+import numpy as np
+import peakutils
+from scipy import signal
 from ImageCutter import ImageCutter
 from NoiseGenerator import NoiseGenerator
 from ParamCalculator import ParamCalculator
 from WindowAligner import WindowAligner
 
+
 inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
 alignedImage = WindowAligner.align(inputImage)
 
 # Alignment
-# cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
-# cv2.imshow("Aligned", alignedImage)
+cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
+cv2.imshow("Aligned", alignedImage)
 
 # Cutting
 phantomImage = ImageCutter.cut(alignedImage, (448, 608), (2648, 2820))
@@ -40,8 +44,20 @@ rows, cols = phantomImage.shape
 rotationMatrix = cv2.getRotationMatrix2D((1107, 1735), 45, 1)
 mtfModule = cv2.warpAffine(phantomImage, rotationMatrix, (rows, cols))
 mtfModule = ImageCutter.cut(mtfModule, (921, 1556), (1286, 1909))
+# mtfModule = cv2.medianBlur(mtfModule, 3)
+#
+# mtfModule = cv2.resize(mtfModule, (0, 0), fx=1 / 2, fy=1 / 2)
+
 cv2.namedWindow("MTF", cv2.WINDOW_NORMAL)
 cv2.imshow("MTF", mtfModule)
 
+y = mtfModule[:, 200:290]
+y = np.sum(y, 1)
+y = y / np.amax(y)
+# peakIndexes = signal.find_peaks_cwt(y, np.arange(1, 8))
+peakIndexes = peakutils.indexes(y)
+plt.plot(y)
+plt.scatter(peakIndexes, y[peakIndexes])
+plt.show()
 cv2.waitKey(0)
 cv2.destroyAllWindows()
