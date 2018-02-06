@@ -3,7 +3,8 @@ import numpy as np
 
 
 class LowContrast:
-    def determineLowContasrt(image):
+    @staticmethod
+    def determineLowContrast(image):
         ref_roi = image[900:1000, 1480:1560]
         ref_mean = ref_roi.mean()
         cut = image[603:1630, 1560:1730]
@@ -11,7 +12,6 @@ class LowContrast:
         median = cv2.medianBlur(resized, 7)
         equalized = cv2.equalizeHist(median)
         edges = cv2.Canny(equalized, 150, 140, None, 3)
-
         binary = cv2.adaptiveThreshold(edges, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \
                                        cv2.THRESH_BINARY, 13, 4)
         circles = cv2.HoughCircles(binary, cv2.HOUGH_GRADIENT, 1, 20,
