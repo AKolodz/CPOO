@@ -1,12 +1,24 @@
 import cv2
 
+from DynamicContrast import DynamicContrast
+from LowContrast import LowContrast
 from WindowAligner import WindowAligner
 
 inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
 alignedImage = WindowAligner.align(inputImage)
+determinedLowContrast = LowContrast.determineLowContasrt(alignedImage)
+determinedDynamicContrast = DynamicContrast.determineDynamicContrast(inputImage)
 
-cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
-cv2.imshow("Aligned", alignedImage)
-
+# odszumianie
+blur = cv2.blur(alignedImage, (5, 5))
+cv2.imshow("blur", blur)
+median3 = cv2.medianBlur(alignedImage, 3)
+cv2.imshow("median3", median3)
+median7 = cv2.medianBlur(alignedImage, 7)
+cv2.imshow("median7", median7)
+gauss = cv2.GaussianBlur(alignedImage, (5, 5), 0)
+cv2.imshow("gauss", gauss)
+bilateral = cv2.bilateralFilter(alignedImage, 9, 75, 75)
+cv2.imshow("bilateral", bilateral)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
