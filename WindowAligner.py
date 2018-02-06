@@ -13,29 +13,20 @@ class WindowAligner:
         image = removeMargins(image, 10 * resolutionMultiplier)
 
         edges = cv2.Canny(lowResImg, 400, 350, None, 3)
-        cv2.namedWindow("Edges", cv2.WINDOW_NORMAL)
-        cv2.imshow("Edges", edges)
+        #cv2.namedWindow("Edges", cv2.WINDOW_NORMAL)
+        #cv2.imshow("Edges", edges)
 
         # morphological opening?
 
         angle = findRotationDegree(edges, lowResImg)
-        cv2.namedWindow("Alignment line", cv2.WINDOW_NORMAL)
-        cv2.imshow("Alignment line", lowResImg)
+        #cv2.namedWindow("Alignment line", cv2.WINDOW_NORMAL)
+        #cv2.imshow("Alignment line", lowResImg)
 
         rows, cols = image.shape
         rotationMatrix = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
         rotatedImage = cv2.warpAffine(image, rotationMatrix, (cols, rows))
 
-        # let user choose 2 points (left upper corner and right bottom corner) that define boundaries of the result image
-        # leftUpperCornerPoint = getPoint(rotatedImage)
-        # rightBottomCornerPoint = getPoint(rotatedImage)
-        # x1, y1 = leftUpperCornerPoint
-        # x2, y2 = rightBottomCornerPoint
-
-        x1, y1 = (448, 608)
-        x2, y2 = (662 * 4, 705 * 4)
-        
-        return rotatedImage[y1:y2, x1:x2]
+        return rotatedImage
 
 
 def lowerResolution(image, times):
@@ -65,8 +56,3 @@ def findRotationDegree(edgesImage, destImage):
     else:
         angle = -999
     return angle
-
-
-def getPoint(image):
-    pass
-

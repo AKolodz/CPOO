@@ -1,13 +1,70 @@
 import cv2
 
+import matplotlib.pyplot as plt
+import numpy as np
+import peakutils
+from scipy import signal
+from ImageCutter import ImageCutter
+from NoiseGenerator import NoiseGenerator
+from ParamCalculator import ParamCalculator
 from DynamicContrast import DynamicContrast
 from LowContrast import LowContrast
 from WindowAligner import WindowAligner
+
 
 inputImage = cv2.imread("ExamplePhantom.png", cv2.IMREAD_GRAYSCALE)
 alignedImage = WindowAligner.align(inputImage)
 determinedLowContrast = LowContrast.determineLowContasrt(alignedImage)
 determinedDynamicContrast = DynamicContrast.determineDynamicContrast(inputImage)
+
+
+# Alignment
+cv2.namedWindow("Aligned", cv2.WINDOW_NORMAL)
+cv2.imshow("Aligned", alignedImage)
+
+# Cutting
+phantomImage = ImageCutter.cut(alignedImage, (448, 608), (2648, 2820))
+cv2.namedWindow("Phantom", cv2.WINDOW_NORMAL)
+cv2.imshow("Phantom", phantomImage)
+
+# Noised image
+noisedImage = NoiseGenerator.addGaussian(phantomImage, 0, 20)
+# cv2.namedWindow("Noised Phantom", cv2.WINDOW_NORMAL)
+# cv2.imshow("Noised Phantom", noisedImage)
+
+# SNR
+snr = ParamCalculator.getSNR(phantomImage, (650, 500), (1500, 950))
+noisedSnr = ParamCalculator.getSNR(noisedImage, (650, 500), (1500, 950))
+
+# Homogeneousness
+roi1 = ImageCutter.cut(phantomImage, (200, 200), (400, 400))
+roi2 = ImageCutter.cut(phantomImage, (1800, 200), (2000, 400))
+roi3 = ImageCutter.cut(phantomImage, (200, 1800), (400, 2000))
+roi4 = ImageCutter.cut(phantomImage, (1800, 1800), (2000, 2000))
+referenceRoi = ImageCutter.cut(phantomImage, (1000, 700), (1200, 900))
+isHomogeneous = ParamCalculator.evalHomogeneousness(roi1, roi2, roi3, roi4, referenceRoi)
+print("Is Homogeneous: {}".format(isHomogeneous))
+
+# MTF
+rows, cols = phantomImage.shape
+rotationMatrix = cv2.getRotationMatrix2D((1107, 1735), 45, 1)
+mtfModule = cv2.warpAffine(phantomImage, rotationMatrix, (rows, cols))
+mtfModule = ImageCutter.cut(mtfModule, (921, 1556), (1286, 1909))
+# mtfModule = cv2.medianBlur(mtfModule, 3)
+#
+# mtfModule = cv2.resize(mtfModule, (0, 0), fx=1 / 2, fy=1 / 2)
+
+cv2.namedWindow("MTF", cv2.WINDOW_NORMAL)
+cv2.imshow("MTF", mtfModule)
+
+y = mtfModule[:, 200:290]
+y = np.sum(y, 1)
+y = y / np.amax(y)
+# peakIndexes = signal.find_peaks_cwt(y, np.arange(1, 8))
+peakIndexes = peakutils.indexes(y)
+plt.plot(y)
+plt.scatter(peakIndexes, y[peakIndexes])
+plt.show()
 
 # odszumianie
 blur = cv2.blur(alignedImage, (5, 5))
@@ -20,5 +77,6 @@ gauss = cv2.GaussianBlur(alignedImage, (5, 5), 0)
 cv2.imshow("gauss", gauss)
 bilateral = cv2.bilateralFilter(alignedImage, 9, 75, 75)
 cv2.imshow("bilateral", bilateral)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
